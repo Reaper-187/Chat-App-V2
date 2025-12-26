@@ -1,16 +1,15 @@
 import { Outlet } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import { ChatProvider } from "./context/ChatContext";
-import "./App.css";
+import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar";
+import { AppSidebar } from "./components/Sidebar/app-sidebar";
 
 export const App = () => {
   return (
-    <>
-      <AuthProvider>
-        <ChatProvider>
-          <Outlet />
-        </ChatProvider>
-      </AuthProvider>
-    </>
+    <SidebarProvider>
+      <AppSidebar />
+      <main className="flex-1">
+        <SidebarTrigger />
+        <Outlet />
+      </main>
+    </SidebarProvider>
   );
 };

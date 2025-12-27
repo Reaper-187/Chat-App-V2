@@ -1,18 +1,18 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
-import { type Chat } from "@/types/Chat";
+import type { Chat } from "@/types/Chat";
 
 interface ChatContextType {
-  chats: Chat[];
-  setChats: React.Dispatch<React.SetStateAction<Chat[]>>;
+  activeChat: Chat | null;
+  setActiveChat: React.Dispatch<React.SetStateAction<Chat | null>>;
 }
 
-const ChatContext = createContext<ChatContextType | undefined>(undefined);
+const ChatContext = createContext<ChatContextType | null>(null);
 
 export const ChatProvider = ({ children }: { children: ReactNode }) => {
-  const [chats, setChats] = useState<Chat[]>([]);
+  const [activeChat, setActiveChat] = useState<Chat | null>(null);
 
   return (
-    <ChatContext.Provider value={{ chats, setChats }}>
+    <ChatContext.Provider value={{ activeChat, setActiveChat }}>
       {children}
     </ChatContext.Provider>
   );

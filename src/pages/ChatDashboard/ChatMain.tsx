@@ -18,18 +18,18 @@ export const ChatMain = () => {
   );
 
   return (
-    <div className="contents">
+    <>
       {!otherUser ? (
         <p className="flex justify-self-center text-2xl">
           Please Select one of your Contacts
         </p>
       ) : (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full max-h-screen">
           <ChatHeader user={otherUser} />
-          <ChatMessages />
+          <ChatMessages messages={activeChat?.messages} />
           <ChatInput />
         </div>
       )}
-    </div>
+    </>
   );
 };

@@ -47,6 +47,104 @@ export function AppSidebar() {
     setActiveChat({
       chatId: null,
       participants: [currentUser, contact],
+      messages: [
+        {
+          messageId: "1",
+          sender: currentUser,
+          content: "Hallo!",
+          timestamp: new Date(),
+        },
+        {
+          messageId: "2",
+          sender: contact,
+          content: "Hey 👋",
+          timestamp: new Date(),
+        },
+        {
+          messageId: "3",
+          sender: currentUser,
+          content: "Hallo!",
+          timestamp: new Date(),
+        },
+        {
+          messageId: "4",
+          sender: contact,
+          content: "Hey 👋",
+          timestamp: new Date(),
+        },
+        {
+          messageId: "5",
+          sender: currentUser,
+          content: "Hallo!",
+          timestamp: new Date(),
+        },
+        {
+          messageId: "6",
+          sender: contact,
+          content: "Hey 👋",
+          timestamp: new Date(),
+        },
+        {
+          messageId: "7",
+          sender: currentUser,
+          content: "Hallo!",
+          timestamp: new Date(),
+        },
+        {
+          messageId: "8",
+          sender: contact,
+          content: "Hey 👋",
+          timestamp: new Date(),
+        },
+        {
+          messageId: "9",
+          sender: currentUser,
+          content: "Hallo!",
+          timestamp: new Date(),
+        },
+        {
+          messageId: "10",
+          sender: contact,
+          content: "Hey 👋",
+          timestamp: new Date(),
+        },
+        {
+          messageId: "11",
+          sender: currentUser,
+          content: "Hallo!",
+          timestamp: new Date(),
+        },
+        {
+          messageId: "12",
+          sender: contact,
+          content: "Hey 👋",
+          timestamp: new Date(),
+        },
+        {
+          messageId: "12",
+          sender: currentUser,
+          content: "Hallo!",
+          timestamp: new Date(),
+        },
+        {
+          messageId: "14",
+          sender: contact,
+          content: "Hey 👋",
+          timestamp: new Date(),
+        },
+        {
+          messageId: "15",
+          sender: currentUser,
+          content: "Hallo!",
+          timestamp: new Date(),
+        },
+        {
+          messageId: "16",
+          sender: contact,
+          content: "Hey 👋",
+          timestamp: new Date(),
+        },
+      ],
     });
   };
 

@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 import { UserRole } from "../../types/express";
 
 interface UserType extends Document {
@@ -60,4 +60,5 @@ const userSchema = new Schema<UserType>({
   resetToken: resetTokenSchema,
 });
 
-module.exports = mongoose.model<UserType>("User", userSchema);
+const User: Model<UserType> = mongoose.model<UserType>("User", userSchema);
+export { User };

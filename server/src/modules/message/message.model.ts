@@ -1,7 +1,7 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 
 interface MessageProps extends Document {
-  chatId: string;
+  chatId: mongoose.Types.ObjectId;
   senderId: mongoose.Types.ObjectId;
   content: string;
   messageType: string;
@@ -23,4 +23,8 @@ const messageSchema = new Schema<MessageProps>({
   timeStamp: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model<MessageProps>("Message", messageSchema);
+const Message: Model<MessageProps> = mongoose.model<MessageProps>(
+  "Message",
+  messageSchema
+);
+export { Message };

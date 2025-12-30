@@ -1,10 +1,11 @@
-import express, { Request, RequestHandler, Response } from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import session from "express-session";
 import { sessionSetup } from "./config/session";
-// import { checkUserAuth } from "./middleware/auth.middleware";
-
+import { checkUserAuth } from "./middleware/auth.middleware";
 import authRoutes from "./modules/user/user.routes";
+import messageRoutes from "./modules/message/message.routes";
+import chatRoutes from "./modules/chat/chat.routes";
 
 export const app = express();
 
@@ -22,7 +23,8 @@ app.use(
 app.use(session(sessionSetup()));
 app.use(express.json());
 app.use("/auth", authRoutes);
-// app.use("/api", checkUserAuth);
+app.use("/api", checkUserAuth, messageRoutes);
+app.use("/api", checkUserAuth, chatRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Backend running");

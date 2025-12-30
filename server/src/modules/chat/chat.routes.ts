@@ -1,10 +1,9 @@
 import { Router } from "express";
 
-const { createChat, getAllChats } = require("./chat.controller");
-const router = Router();
+const { getAllChats } = require("./chat.controller");
 
-router.post("/createChat", createChat); //zum erstellen eines Chats
+const router = Router();
 
 router.get("/allChats", getAllChats); // user sieht chats mit denen er gesprochen hat (sidebar)
 
-module.exports = router;
+export default router;

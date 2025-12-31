@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { User } from "./user.model";
 import bcrypt from "bcrypt";
+import { Guest } from "../guest/guest.model";
+import { cleanupGuestData } from "../../middleware/guest.auth.middleware";
 // import crypto from "crypto";
 
 exports.registUser = async (req: Request, res: Response) => {
@@ -79,10 +81,10 @@ exports.loginUser = async (req: Request, res: Response) => {
     if (!findUserAccount)
       return res.status(400).json({ message: "wrong email or password" });
 
-    if (await findUserAccount.blockedAccount.blocked)
-      return res.status(400).json({
-        message: "Your Account is blocked apply to the Admin",
-      });
+    // if (await findUserAccount.blockedAccount.blocked)
+    //   return res.status(400).json({
+    //     message: "Your Account is blocked apply to the Admin",
+    //   });
 
     const comparedPw = await bcrypt.compare(password, findUserAccount.password);
 
@@ -132,13 +134,17 @@ exports.logOutUser = async (
   next: NextFunction
 ) => {
   try {
+    const { userId } = req.session;
     if (!req.session) {
       return res.status(400).json({ message: "No active session" });
     }
 
-    // if (req.session.userRole === "guest") {
-    //   await Guest.findByIdAndDelete(req.session.userId);
-    // }
+    if (!userId) {
+      return next();
+    }
+    if (req.session.userRole === "guest") {
+      await cleanupGuestData(userId);
+    }
 
     req.session.destroy((err) => {
       if (err) {

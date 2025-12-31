@@ -6,7 +6,7 @@ declare module "express-session" {
     userId: string;
     lastName: string;
     userRole: UserRole;
-    // guestExpires?: Date;
+    guestExpires?: Date;
   }
 }
 

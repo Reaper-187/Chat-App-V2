@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { User } from "../user/user.model";
 import { Message } from "./message.model";
 import { Chat } from "../chat/chat.model";
+import { Guest } from "../guest/guest.model";
 
 exports.sendMessage = async (
   req: Request,
@@ -12,9 +13,10 @@ exports.sendMessage = async (
     const { userId } = req.session;
     const { receiverId, content } = req.body;
 
-    const findreceivedUser = await User.findById(receiverId);
+    const findReceivedUser =
+      (await User.findById(receiverId)) || (await Guest.findById(receiverId));
 
-    if (!userId || !findreceivedUser)
+    if (!userId || !findReceivedUser)
       return res.status(401).json({ message: "Error: Please try later" });
 
     let chat = await Chat.findOne({

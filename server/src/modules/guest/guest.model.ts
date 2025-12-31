@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 import { UserRole } from "../../types/express";
 
 interface GuestType extends Document {
@@ -19,4 +19,5 @@ const guestSchema = new Schema<GuestType>({
   expiresAt: { type: Date },
 });
 
-module.exports = mongoose.model<GuestType>("Guest", guestSchema);
+const Guest: Model<GuestType> = mongoose.model<GuestType>("Guest", guestSchema);
+export { Guest };

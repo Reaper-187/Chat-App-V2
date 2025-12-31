@@ -1,8 +1,17 @@
 import { Router } from "express";
+import { checkUserAuth } from "../../middleware/auth.middleware";
+import { checkGuestExpiry } from "../../middleware/guest.auth.middleware";
 
-const { loginUser, registUser, logOutUser } = require("./user.controller");
+const {
+  userInfo,
+  loginUser,
+  registUser,
+  logOutUser,
+} = require("./user.controller");
 
 const router = Router();
+
+router.get("/userInfo", checkUserAuth, checkGuestExpiry, userInfo);
 
 router.post("/login", loginUser);
 

@@ -5,6 +5,33 @@ import { Guest } from "../guest/guest.model";
 import { cleanupGuestData } from "../../middleware/guest.auth.middleware";
 // import crypto from "crypto";
 
+exports.userInfo = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { userId: _id } = req.session;
+
+    const user =
+      (await User.findOne({ _id })) || (await Guest.findOne({ _id }));
+
+    if (!user) return res.status(401).json({ message: "no premission" });
+
+    const isAuthenticated = !!user;
+
+    const userInfo = {
+      userId: _id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      avatarUrl: user.avatar,
+      userRole: user.userRole,
+      isAuthenticated,
+    };
+
+    res.status(200).json({ userInfo });
+  } catch (err) {
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 exports.registUser = async (req: Request, res: Response) => {
   try {
     const user = req.body;
@@ -119,7 +146,6 @@ exports.loginUser = async (req: Request, res: Response) => {
     // bei Anfragen wird so indentifiziert ob der user auth ist
 
     req.session.userId = findUserAccount._id.toString();
-    req.session.lastName = findUserAccount.lastName;
     req.session.userRole = findUserAccount.userRole;
     req.session.save();
     res.status(200).json({ message: "Login successfully" });

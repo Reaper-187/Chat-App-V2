@@ -12,27 +12,11 @@ import { AuthProvider } from "./context/AuthContext.tsx";
 import { Toaster } from "sonner";
 import { ChatProvider } from "./context/ChatContext.tsx";
 import { ChatMain } from "./pages/ChatDashboard/ChatMain.tsx";
+import { Login } from "./pages/Auth-Pages/Login.tsx";
+import { Register } from "./pages/Auth-Pages/Register.tsx";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+const queryClient = new QueryClient();
 
-// {
-//   path: "/login",
-//   element: (
-//     <>
-//       <PublicRoute>
-//         <Login />
-//       </PublicRoute>
-//     </>
-//   ),
-// },
-// {
-//   path: "/register",
-//   element: (
-//     <>
-//       <PublicRoute>
-//         <Register />
-//       </PublicRoute>
-//     </>
-//   ),
-// },
 // {
 //   path: "/reset-password-authentication",
 //   element: (
@@ -69,13 +53,34 @@ import { ChatMain } from "./pages/ChatDashboard/ChatMain.tsx";
 // },
 const router = createBrowserRouter([
   {
+    path: "/login",
+    element: (
+      <>
+        <Login />
+        {/* <PublicRoute>
+      </PublicRoute> */}
+      </>
+    ),
+  },
+  {
+    path: "/register",
+    element: (
+      <>
+        <Register />
+        {/* <PublicRoute>
+      </PublicRoute> */}
+      </>
+    ),
+  },
+
+  {
     element: (
       // <ProtectedRoute>
       <App />
       // </ProtectedRoute>
     ),
     children: [
-      { path: "/", element: <Navigate to="/chat" replace /> },
+      { path: "/", element: <Navigate to="/login" replace /> },
       {
         path: "chat",
         element: <ChatMain />,
@@ -87,10 +92,12 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Toaster />
-    <AuthProvider>
-      <ChatProvider>
-        <RouterProvider router={router} />
-      </ChatProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <ChatProvider>
+          <RouterProvider router={router} />
+        </ChatProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   </StrictMode>
 );

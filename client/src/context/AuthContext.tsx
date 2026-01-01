@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoadingSpinner("unauthenticated");
     } else if (userData?.isAuthenticated) {
       setUser({
-        isAuthenticated: true,
+        isAuthenticated: userData.isAuthenticated,
         userId: userData.userId,
         userRole: userData.userRole,
         firstName: userData.firstName,

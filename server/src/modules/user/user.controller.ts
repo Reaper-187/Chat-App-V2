@@ -12,7 +12,13 @@ exports.userInfo = async (req: Request, res: Response, next: NextFunction) => {
     const user =
       (await User.findOne({ _id })) || (await Guest.findOne({ _id }));
 
-    if (!user) return res.status(401).json({ message: "no premission" });
+    if (!user) {
+      return res.status(200).json({
+        userInfo: {
+          isAuthenticated: false,
+        },
+      });
+    }
 
     const isAuthenticated = !!user;
 
@@ -62,7 +68,6 @@ exports.registUser = async (req: Request, res: Response) => {
       //   verifyTokenExp: tokenExpires,
       // },
     });
-    console.log("New User Created", newUser);
 
     await newUser.save();
 

@@ -8,7 +8,6 @@ type PublicRouteProps = PropsWithChildren;
 
 export const PublicRoute = ({ children }: PublicRouteProps) => {
   const { loadingSpinner } = useAuth();
-  console.log("loadingSpinner", loadingSpinner);
 
   if (loadingSpinner === "loading") {
     return <Spinner />;

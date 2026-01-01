@@ -1,4 +1,4 @@
-import type { User, UserInfoResponse } from "@/types/User";
+import type { UserInfoResponse } from "@/types/User";
 import axios from "axios";
 
 export type ApiMessage = { message: string };
@@ -17,7 +17,6 @@ export const getUserInfo = async (): Promise<UserInfoResponse> => {
   const response = await axios.get<UserInfoResponse>(USER_INFO_API, {
     withCredentials: true,
   });
-  console.log("response", response);
 
   return response.data;
 };

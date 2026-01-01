@@ -15,6 +15,8 @@ import { ChatMain } from "./pages/ChatDashboard/ChatMain.tsx";
 import { Login } from "./pages/Auth-Pages/Login.tsx";
 import { Register } from "./pages/Auth-Pages/Register.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { PublicRoute } from "./hooks/ProtectedRoutes/PublicRoute.tsx";
+import { ProtectedRoute } from "./hooks/ProtectedRoutes/ProtectedRoute.tsx";
 const queryClient = new QueryClient();
 
 // {
@@ -56,9 +58,9 @@ const router = createBrowserRouter([
     path: "/login",
     element: (
       <>
-        <Login />
-        {/* <PublicRoute>
-      </PublicRoute> */}
+        <PublicRoute>
+          <Login />
+        </PublicRoute>
       </>
     ),
   },
@@ -66,18 +68,18 @@ const router = createBrowserRouter([
     path: "/register",
     element: (
       <>
-        <Register />
-        {/* <PublicRoute>
-      </PublicRoute> */}
+        <PublicRoute>
+          <Register />
+        </PublicRoute>
       </>
     ),
   },
 
   {
     element: (
-      // <ProtectedRoute>
-      <App />
-      // </ProtectedRoute>
+      <ProtectedRoute>
+        <App />
+      </ProtectedRoute>
     ),
     children: [
       { path: "/", element: <Navigate to="/login" replace /> },

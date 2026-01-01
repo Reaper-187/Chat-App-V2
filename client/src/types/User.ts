@@ -8,3 +8,16 @@ export interface User {
   isAuthenticated: boolean;
   online: boolean;
 }
+
+export interface UserInfoResponse {
+  userInfo: {
+    userId: string;
+    firstName: string;
+    lastName: string;
+    email?: string;
+    avatarUrl?: string;
+    userRole: UserRole;
+    isAuthenticated: boolean;
+    online: boolean;
+  };
+}

@@ -17,13 +17,12 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     firstName: "X",
     lastName: "Y",
     avatarUrl: "XX",
-    online: true,
   };
 
   const handleSendMessage = (content: string) => {
     const newMessage: Message = {
       messageId: "17",
-      sender: currentUser,
+      sender: currentUser.userId,
       content,
       timestamp: new Date(),
     };

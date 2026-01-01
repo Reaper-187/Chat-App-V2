@@ -25,11 +25,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const [user, setUser] = useState<User | null>(null);
 
-  const {
-    data: userData,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["auth"],
     queryFn: getUserInfo,
   });
@@ -37,21 +33,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (isLoading) {
       setLoadingSpinner("loading");
-    } else if (error || !userData?.isAuthenticated) {
+    } else if (error || !data?.userInfo?.isAuthenticated) {
       setUser(null);
       setLoadingSpinner("unauthenticated");
-    } else if (userData?.isAuthenticated) {
+    } else if (data?.userInfo?.isAuthenticated) {
       setUser({
-        isAuthenticated: userData.isAuthenticated,
-        userId: userData.userId,
-        userRole: userData.userRole,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        online: userData.online,
+        isAuthenticated: data?.userInfo.isAuthenticated,
+        userId: data?.userInfo.userId,
+        userRole: data?.userInfo.userRole,
+        firstName: data?.userInfo.firstName,
+        lastName: data?.userInfo.lastName,
+        online: data.userInfo.online,
       });
       setLoadingSpinner("authenticated");
     }
-  }, [userData, isLoading, error]);
+  }, [data, isLoading, error]);
 
   return (
     <AuthContext.Provider

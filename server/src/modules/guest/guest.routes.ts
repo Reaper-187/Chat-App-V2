@@ -3,6 +3,6 @@ import { Router } from "express";
 const { guestAccess } = require("./guest.controller");
 const router = Router();
 
-router.post("/auth/guestLogin", guestAccess);
+router.post("/guestLogin", guestAccess);
 
 export default router;

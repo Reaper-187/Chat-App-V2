@@ -24,10 +24,10 @@ app.use(
 
 app.use(session(sessionSetup()));
 app.use(express.json());
-app.use("/auth", authRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/auth", guestRoute);
 app.use("/api", checkUserAuth, checkGuestExpiry, messageRoutes);
 app.use("/api", checkUserAuth, checkGuestExpiry, chatRoutes);
-app.use("/auth", guestRoute);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Backend running");

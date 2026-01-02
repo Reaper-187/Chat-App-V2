@@ -9,6 +9,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "mongoose": "^9.0.2",
+    "socket.io": "^4.8.3",
     "zod": "^4.2.1"
   },
   "devDependencies": {
@@ -18,6 +19,7 @@
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.6",
     "@types/node": "^25.0.3",
+    "@types/socket.io": "^3.0.1",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"

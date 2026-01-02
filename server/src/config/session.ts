@@ -1,4 +1,5 @@
 import MongoStore from "connect-mongo";
+import session from "express-session";
 
 // Helferfunktion für sichere Env-Variablen
 function getEnvVar(name: string): string {
@@ -12,7 +13,7 @@ function getEnvVar(name: string): string {
 const secret = getEnvVar("SECRET_KEY");
 const mongoUrl = getEnvVar("MONGODB_URI");
 
-export const sessionSetup = () => ({
+export const sessionSetup = session({
   name: "connect.sid",
   secret,
   resave: false,
@@ -28,3 +29,8 @@ export const sessionSetup = () => ({
     sameSite: "lax" as const,
   },
 });
+
+export const corsSetup = {
+  origin: process.env.FRONTEND_URL ?? "http://localhost:5173",
+  credentials: true,
+};

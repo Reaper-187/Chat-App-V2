@@ -4,6 +4,7 @@ import { corsSetup, sessionSetup } from "./config/session";
 import { checkUserAuth } from "./middleware/auth.middleware";
 import { checkGuestExpiry } from "./middleware/guest.auth.middleware";
 import { SessionData } from "express-session";
+import { saveSendMessage } from "./modules/message/message.service";
 
 // socket arbeitet nicht mit req,res,next sondern nur mit socket,next daher
 // Wrapper-Funktion
@@ -20,7 +21,13 @@ interface SessionSocket extends Socket {
   request: SessionIncomingMessage;
 }
 
-const users = new Map();
+interface SendMessageProps {
+  chatId: string | null;
+  recipientUserId: string;
+  content: string;
+}
+
+const users = new Map<string, Socket>();
 
 export function initSocket(server: HttpServer) {
   const io = new Server(server, {
@@ -43,6 +50,7 @@ export function initSocket(server: HttpServer) {
     const socket = <SessionSocket>defaultSocket;
     const userId = socket.request.session.userId;
 
+    // connection-events
     // Prüfen ob eine Verbindung existiert
     const existingSocket = users.get(userId);
     if (existingSocket) {
@@ -62,8 +70,28 @@ export function initSocket(server: HttpServer) {
       console.log("User disconnected", userId);
     });
 
+    // User-Events
+
+    socket.on("chat:message", async (sendMessagePayload: SendMessageProps) => {
+      const { chatId, message } = await saveSendMessage({
+        senderId: userId!,
+        recipientId: sendMessagePayload.recipientUserId,
+        content: sendMessagePayload.content,
+      });
+
+      const recipientSocket = users.get(sendMessagePayload.recipientUserId);
+      if (recipientSocket)
+        recipientSocket.emit("chat:message", { chatId, message });
+    });
+
     return console.log("User Connected", userId);
   });
 
   return io;
 }
+
+// Ein Event besteht immer aus:
+
+// Name (String)
+// Payload (Daten)
+// Richtung (Client → Server oder Server → Client)#

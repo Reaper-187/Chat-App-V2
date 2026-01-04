@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { User } from "../user/user.model";
 import { Message } from "./message.model";
 import { Chat } from "../chat/chat.model";
-import { Guest } from "../guest/guest.model";
+import { saveSendMessage } from "./message.service";
 
 exports.sendMessage = async (
   req: Request,
@@ -13,29 +12,16 @@ exports.sendMessage = async (
     const { userId } = req.session;
     const { receiverId, content } = req.body;
 
-    const findReceivedUser =
-      (await User.findById(receiverId)) || (await Guest.findById(receiverId));
-
-    if (!userId || !findReceivedUser)
-      return res.status(401).json({ message: "Error: Please try later" });
-
-    let chat = await Chat.findOne({
-      participants: { $all: [userId, receiverId] },
-    });
-
-    if (!chat) {
-      chat = await Chat.create({
-        participants: [userId, receiverId],
-      });
+    if (!userId || !receiverId || !content) {
+      return res.status(400).json({ message: "Invalid request data" });
     }
 
-    const newMessage = new Message({
-      chatId: chat?._id,
+    await saveSendMessage({
       senderId: userId,
+      recipientId: receiverId,
       content,
     });
 
-    await newMessage.save();
     res.status(200).json({ message: "Message saved" });
   } catch (err) {
     res.status(500).json({ message: "Server Error" });

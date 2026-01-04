@@ -36,10 +36,11 @@ export function initSocket(server: HttpServer) {
 
   io.engine.use(sessionSetup);
 
-  io.use(async (socket, next) => {
+  io.use(async (defaultSocket: Socket, next) => {
+    const socket = <SessionSocket>defaultSocket;
     try {
-      io.use(wrap(checkUserAuth));
-      io.use(wrap(checkGuestExpiry));
+      wrap(checkUserAuth)(socket, next);
+      wrap(checkGuestExpiry)(socket, next);
       next();
     } catch (err: any) {
       next(err);
@@ -49,6 +50,11 @@ export function initSocket(server: HttpServer) {
   io.on("connection", (defaultSocket: Socket) => {
     const socket = <SessionSocket>defaultSocket;
     const userId = socket.request.session.userId;
+
+    if (!userId) {
+      socket.disconnect(true);
+      return;
+    }
 
     // connection-events
     // Prüfen ob eine Verbindung existiert
@@ -60,8 +66,6 @@ export function initSocket(server: HttpServer) {
     // neue Verbindung setzen
     users.set(userId, socket);
 
-    console.log("User connected", userId);
-
     socket.on("disconnect", () => {
       // Map cleanen wenn der User sich trennt
       if (users.get(userId) === socket) {
@@ -71,7 +75,6 @@ export function initSocket(server: HttpServer) {
     });
 
     // User-Events
-
     socket.on("chat:message", async (sendMessagePayload: SendMessageProps) => {
       const { chatId, message } = await saveSendMessage({
         senderId: userId!,

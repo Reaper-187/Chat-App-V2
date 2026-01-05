@@ -11,7 +11,7 @@ import "./index.css";
 import { AuthProvider } from "./context/AuthContext.tsx";
 import { Toaster } from "sonner";
 import { ChatProvider } from "./context/ChatContext.tsx";
-import { ChatMain } from "./pages/ChatDashboard/ChatMain.tsx";
+import { ChatScreen } from "./pages/ChatDashboard/ChatScreen.tsx";
 import { Login } from "./pages/Auth-Pages/Login.tsx";
 import { Register } from "./pages/Auth-Pages/Register.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -86,7 +86,7 @@ const router = createBrowserRouter([
       { path: "/", element: <Navigate to="/login" replace /> },
       {
         path: "chat",
-        element: <ChatMain />,
+        element: <ChatScreen />,
       },
     ],
   },

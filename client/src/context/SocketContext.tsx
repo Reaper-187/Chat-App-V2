@@ -1,3 +1,4 @@
+import type { Message } from "@/types/Message";
 import {
   createContext,
   useContext,
@@ -10,6 +11,7 @@ import { io, Socket } from "socket.io-client";
 
 interface SocketContextType {
   sendMessageSocket: (payloade: SendMessage) => void;
+  setIncomingHandler: (fn: (message: Message) => void) => void;
 }
 
 interface SendMessage {
@@ -22,35 +24,44 @@ const SocketContext = createContext<SocketContextType | undefined>(undefined);
 
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const socketRef = useRef<Socket | null>(null);
+  const incomingHandlerRef = useRef<((message: Message) => void) | null>(null);
 
   useEffect(() => {
-    if (!socketRef.current) {
-      socketRef.current = io("http://localhost:5000", {
-        withCredentials: true,
-      });
-    }
+    socketRef.current = io("http://localhost:5000", {
+      withCredentials: true,
+    });
     return () => {
       socketRef.current?.disconnect();
     };
   }, []);
 
   useEffect(() => {
-    socketRef.current?.on("chat:message", (message) => {
-      console.log(message);
-    });
+    const socket = socketRef.current;
+    if (!socket) return;
+
+    const handler = (message: Message) => {
+      if (incomingHandlerRef.current) {
+        incomingHandlerRef.current(message);
+      }
+    };
+
+    socket.on("chat:message", handler);
 
     return () => {
-      socketRef.current?.off("chat:message");
+      socket.off("chat:message", handler);
     };
   }, []);
 
+  const setIncomingHandler = (fn: (message: Message) => void) => {
+    incomingHandlerRef.current = fn;
+  };
+
   const sendMessageSocket = (payload: SendMessage) => {
-    if (!socketRef.current) return;
-    socketRef.current.emit("chat:message", payload);
+    socketRef.current?.emit("chat:message", payload);
   };
 
   return (
-    <SocketContext.Provider value={{ sendMessageSocket }}>
+    <SocketContext.Provider value={{ sendMessageSocket, setIncomingHandler }}>
       {children}
     </SocketContext.Provider>
   );

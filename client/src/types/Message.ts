@@ -1,9 +1,8 @@
 import { type User } from "./User";
 
 export interface Message {
-  messageId: string;
-  sender: User["userId"];
+  messageId?: string;
+  sender: User;
   content: string;
-  imageUrl?: string;
   timestamp: Date;
 }

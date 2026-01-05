@@ -1,20 +1,14 @@
-import { ChatInput } from "@/components/ChatScreen/Chat-Input";
-import { ChatHeader } from "@/components/ChatScreen/ChatHeader";
-import { ChatMessages } from "@/components/ChatScreen/ChatMessages";
+import { ChatInput } from "@/components/ChatComp/Chat-Input";
+import { ChatHeader } from "@/components/ChatComp/ChatHeader";
+import { ChatMessages } from "@/components/ChatComp/ChatMessages";
+import { useAuth } from "@/context/AuthContext";
 import { useChat } from "@/context/ChatContext";
 
-export const ChatMain = () => {
+export const ChatScreen = () => {
   const { activeChat } = useChat();
-  const currentUser = {
-    userId: "Admin1",
-    firstName: "X",
-    lastName: "Y",
-    avatarUrl: "XX",
-    online: true,
-  };
-
+  const { user } = useAuth();
   const otherUser = activeChat?.participants.find(
-    (u) => u.userId !== currentUser.userId
+    (u) => u.userId !== user?.userId
   );
 
   return (

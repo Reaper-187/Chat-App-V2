@@ -9,6 +9,8 @@ import type { Chat } from "@/types/Chat";
 import type { Message } from "@/types/Message";
 import { useQuery } from "@tanstack/react-query";
 import { getMessages } from "@/service/chatService";
+import { useSocket } from "./SocketContext";
+import { useAuth } from "./AuthContext";
 
 interface ChatContextType {
   activeChat: Chat | null;
@@ -19,7 +21,10 @@ interface ChatContextType {
 const ChatContext = createContext<ChatContextType | null>(null);
 
 export const ChatProvider = ({ children }: { children: ReactNode }) => {
+  const { setIncomingHandler, sendMessageSocket } = useSocket();
+
   const [activeChat, setActiveChat] = useState<Chat | null>(null);
+
   const { data, isLoading } = useQuery({
     queryKey: ["messages", activeChat?.chatId],
     queryFn: () => getMessages(activeChat!.chatId!),
@@ -39,30 +44,45 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     );
   }, [data]);
 
-  const currentUser = {
-    userId: "Admin1",
-    firstName: "X",
-    lastName: "Y",
-    avatarUrl: "XX",
-  };
+  const { user } = useAuth();
 
   const handleSendMessage = (content: string) => {
+    if (!activeChat || !user) return;
+
     const newMessage: Message = {
-      messageId: "17",
-      sender: currentUser.userId,
+      messageId: crypto.randomUUID(),
+      sender: user,
       content,
       timestamp: new Date(),
     };
 
     setActiveChat((prev) => {
       if (!prev) return prev;
+      return { ...prev, messages: [...(prev.messages ?? []), newMessage] };
+    });
 
+    // Socket senden
+    sendMessageSocket({
+      chatId: activeChat.chatId!,
+      recipient: activeChat.participants.find((p) => p.userId !== user?.userId)
+        ?.userId!,
+      content,
+    });
+  };
+
+  const handleIncomingMessage = (message: Message) => {
+    setActiveChat((prev) => {
+      if (!prev) return prev;
       return {
         ...prev,
-        messages: [...(prev.messages ?? []), newMessage],
+        messages: [...(prev.messages ?? []), message],
       };
     });
   };
+
+  useEffect(() => {
+    setIncomingHandler(handleIncomingMessage);
+  }, [handleIncomingMessage, setIncomingHandler]);
 
   return (
     <ChatContext.Provider

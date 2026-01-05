@@ -1,6 +1,14 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import type { Chat } from "@/types/Chat";
 import type { Message } from "@/types/Message";
+import { useQuery } from "@tanstack/react-query";
+import { getMessages } from "@/service/chatService";
 
 interface ChatContextType {
   activeChat: Chat | null;
@@ -12,6 +20,25 @@ const ChatContext = createContext<ChatContextType | null>(null);
 
 export const ChatProvider = ({ children }: { children: ReactNode }) => {
   const [activeChat, setActiveChat] = useState<Chat | null>(null);
+  const { data, isLoading } = useQuery({
+    queryKey: ["messages", activeChat?.chatId],
+    queryFn: () => getMessages(activeChat!.chatId!),
+    enabled: !!activeChat?.chatId,
+  });
+
+  useEffect(() => {
+    if (!data || !activeChat) return;
+
+    setActiveChat((prev) =>
+      prev
+        ? {
+            ...prev,
+            messages: data.messages,
+          }
+        : prev
+    );
+  }, [data]);
+
   const currentUser = {
     userId: "Admin1",
     firstName: "X",

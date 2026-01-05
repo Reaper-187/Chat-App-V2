@@ -1,4 +1,4 @@
-import { guestAccess } from "@/service/services";
+import { guestAccess } from "@/service/authServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { toast } from "sonner";

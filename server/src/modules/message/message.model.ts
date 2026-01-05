@@ -4,7 +4,6 @@ interface MessageProps extends Document {
   chatId: mongoose.Types.ObjectId;
   senderId: mongoose.Types.ObjectId;
   content: string;
-  messageType: string;
   timeStamp: Date;
 }
 
@@ -15,11 +14,6 @@ const messageSchema = new Schema<MessageProps>({
     required: true,
   },
   content: String,
-  messageType: {
-    type: String,
-    enum: ["text", "imange", "file"],
-    default: "text",
-  },
   timeStamp: { type: Date, default: Date.now },
 });
 

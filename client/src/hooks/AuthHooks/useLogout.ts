@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { fetchLogout } from "@/service/services";
+import { fetchLogout } from "@/service/authServices";
 import { useNavigate } from "react-router-dom";
 import type { AxiosError } from "axios";
 

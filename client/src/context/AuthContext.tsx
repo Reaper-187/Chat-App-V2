@@ -7,7 +7,7 @@ import {
 } from "react";
 import { type User } from "@/types/User";
 import { useQuery } from "@tanstack/react-query";
-import { getUserInfo } from "@/service/services";
+import { getUserInfo } from "@/service/authServices";
 
 interface AuthContextType {
   user: User | null;

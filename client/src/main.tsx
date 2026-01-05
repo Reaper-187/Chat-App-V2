@@ -17,6 +17,7 @@ import { Register } from "./pages/Auth-Pages/Register.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PublicRoute } from "./hooks/ProtectedRoutes/PublicRoute.tsx";
 import { ProtectedRoute } from "./hooks/ProtectedRoutes/ProtectedRoute.tsx";
+import { SocketProvider } from "./context/SocketContext.tsx";
 const queryClient = new QueryClient();
 
 // {
@@ -96,9 +97,11 @@ createRoot(document.getElementById("root")!).render(
     <Toaster />
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <ChatProvider>
-          <RouterProvider router={router} />
-        </ChatProvider>
+        <SocketProvider>
+          <ChatProvider>
+            <RouterProvider router={router} />
+          </ChatProvider>
+        </SocketProvider>
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>

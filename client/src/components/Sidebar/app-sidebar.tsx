@@ -13,140 +13,50 @@ import { SidebarSwitcher } from "./SidebarSwitcher";
 import type { User } from "@/types/User";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useChat } from "@/context/ChatContext";
-
-// Contacts-lsit.
-const contacts: User[] = [
-  {
-    userId: "user-1",
-    firstName: "Lisa",
-    lastName: "Müller",
-    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Lisa",
-    online: false,
-  },
-  {
-    userId: "user-2",
-    firstName: "Max",
-    lastName: "Mustermann",
-    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Max",
-    online: true,
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { getChat } from "@/service/chatService";
+import { useAuth } from "@/context/AuthContext";
 
 export function AppSidebar() {
+  const [chatContacts, setChatContacts] = useState<User[]>([]); // State für Contacts
   const { setActiveChat } = useChat();
+  const { user } = useAuth();
 
-  const currentUser = {
-    userId: "Admin1",
-    firstName: "X",
-    lastName: "Y",
-    avatarUrl: "XX",
-    online: true,
-  };
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["chat"],
+    queryFn: getChat,
+  });
+
+  useEffect(() => {
+    if (data?.chats) {
+      // Wandeln wir die Chat-Daten in ein User-Array für die Sidebar
+      const contactsFromChats: User[] = data.chats.map((chat: any) => {
+        const contact = chat.participants.find(
+          (p: any) => p._id !== user?.userId
+        );
+        return {
+          userId: contact._id,
+          firstName: contact.firstName,
+          lastName: contact.lastName,
+          avatarUrl: contact.avatarUrl,
+          online: contact.online,
+        };
+      });
+      setChatContacts(contactsFromChats);
+    }
+  }, [data]);
 
   const handleActiveChat = (contact: User) => {
     setActiveChat({
       chatId: null,
-      participants: [currentUser, contact],
-      messages: [
-        {
-          messageId: "1",
-          sender: currentUser,
-          content: "Hallo!",
-          timestamp: new Date(),
-        },
-        {
-          messageId: "2",
-          sender: contact,
-          content: "Hey 👋",
-          timestamp: new Date(),
-        },
-        {
-          messageId: "3",
-          sender: currentUser,
-          content: "Hallo!",
-          timestamp: new Date(),
-        },
-        {
-          messageId: "4",
-          sender: contact,
-          content: "Hey 👋",
-          timestamp: new Date(),
-        },
-        {
-          messageId: "5",
-          sender: currentUser,
-          content: "Hallo!",
-          timestamp: new Date(),
-        },
-        {
-          messageId: "6",
-          sender: contact,
-          content: "Hey 👋",
-          timestamp: new Date(),
-        },
-        {
-          messageId: "7",
-          sender: currentUser,
-          content: "Hallo!",
-          timestamp: new Date(),
-        },
-        {
-          messageId: "8",
-          sender: contact,
-          content: "Hey 👋",
-          timestamp: new Date(),
-        },
-        {
-          messageId: "9",
-          sender: currentUser,
-          content: "Hallo!",
-          timestamp: new Date(),
-        },
-        {
-          messageId: "10",
-          sender: contact,
-          content: "Hey 👋",
-          timestamp: new Date(),
-        },
-        {
-          messageId: "11",
-          sender: currentUser,
-          content: "Hallo!",
-          timestamp: new Date(),
-        },
-        {
-          messageId: "12",
-          sender: contact,
-          content: "Hey 👋",
-          timestamp: new Date(),
-        },
-        {
-          messageId: "12",
-          sender: currentUser,
-          content: "Hallo!",
-          timestamp: new Date(),
-        },
-        {
-          messageId: "14",
-          sender: contact,
-          content: "Hey 👋",
-          timestamp: new Date(),
-        },
-        {
-          messageId: "15",
-          sender: currentUser,
-          content: "Hallo!",
-          timestamp: new Date(),
-        },
-        {
-          messageId: "16",
-          sender: contact,
-          content: "Hey 👋",
-          timestamp: new Date(),
-        },
-      ],
+      participants: [user, contact],
+      messages: [],
     });
   };
+
+  if (isLoading) return <p>Loading chats...</p>;
+  if (error) return <p>Error loading chats</p>;
 
   return (
     <Sidebar>
@@ -159,7 +69,7 @@ export function AppSidebar() {
           <SidebarGroupLabel>Contacts</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {contacts.map((contact) => (
+              {chatContacts.map((contact) => (
                 <SidebarMenuItem key={contact.userId}>
                   <SidebarMenuButton
                     className="flex items-center gap-3 p-3 hover:bg-muted/50 transition-colors"

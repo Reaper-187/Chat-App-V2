@@ -23,7 +23,6 @@ export const checkUserAuth = async (
 
     next();
   } catch (err) {
-    console.error("Auth Middleware Error:", err);
     next(err);
   }
 };

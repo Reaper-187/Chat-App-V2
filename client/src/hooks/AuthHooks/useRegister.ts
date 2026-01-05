@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { fetchRegister } from "@/service/services";
+import { fetchRegister } from "@/service/authServices";
 import { useNavigate } from "react-router-dom";
 import type { AxiosError } from "axios";
 

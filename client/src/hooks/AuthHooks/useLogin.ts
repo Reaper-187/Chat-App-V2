@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { fetchLogin } from "@/service/services";
+import { fetchLogin } from "@/service/authServices";
 import type { AxiosError } from "axios";
 
 export const useLogin = () => {

@@ -5,8 +5,12 @@ import { getAllContacts } from "@/service/chatService";
 import type { User } from "@/types/User";
 import { useDebounce } from "@/hooks/Debouncer/useBouncer";
 import { useChat } from "@/context/ChatContext";
+import { useAuth } from "@/context/AuthContext";
 
 export const SearchInput = () => {
+  const { user } = useAuth();
+  const { handleActiveChat } = useChat();
+
   const [renderUser, setRenderUser] = useState<User[] | null>();
 
   const [searchContact, setSearchContact] = useState<string | null>("");
@@ -23,7 +27,6 @@ export const SearchInput = () => {
 
   useEffect(() => {
     setRenderUser(data);
-    console.log(data);
   }, [data]);
 
   if (isLoading) {
@@ -37,13 +40,13 @@ export const SearchInput = () => {
     setSearchContact(e.currentTarget.value);
   };
 
-  const searchResult = renderUser?.filter((user) => {
+  const searchResult = renderUser?.filter((contact) => {
+    if (contact.userId === user?.userId) return false;
+
     const searchTerm = debouncedSearch.toLowerCase() || "";
-    const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+    const fullName = `${contact.firstName} ${contact.lastName}`.toLowerCase();
     return fullName.includes(searchTerm);
   });
-
-  const { handleActiveChat } = useChat();
 
   return (
     <div>
@@ -53,17 +56,17 @@ export const SearchInput = () => {
       />
       {debouncedSearch && (
         <div className="border rounded shadow">
-          {searchResult?.map((user) => (
+          {searchResult?.map((contact) => (
             <div
-              key={user.userId}
+              key={contact.userId}
               className="p-2 flex justify-end hover:bg-gray-100 cursor-pointer"
               onClick={() => {
-                handleActiveChat(user);
+                handleActiveChat(contact);
               }}
             >
               <p>
-                {user.avatarUrl}
-                {user.firstName} {user.lastName}
+                {contact.avatarUrl}
+                {contact.firstName} {contact.lastName}
               </p>
             </div>
           ))}

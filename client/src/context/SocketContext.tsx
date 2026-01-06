@@ -17,7 +17,7 @@ interface SocketContextType {
 interface SendMessage {
   chatId: string;
   content: string;
-  recipient: string;
+  recipientUserId: string;
 }
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
@@ -30,8 +30,10 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     socketRef.current = io("http://localhost:5000", {
       withCredentials: true,
     });
+    const socket = socketRef.current;
+
     return () => {
-      socketRef.current?.disconnect();
+      socket.disconnect();
     };
   }, []);
 
@@ -44,8 +46,6 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
         incomingHandlerRef.current(message);
       }
     };
-
-    socket.on("chat:message", handler);
 
     return () => {
       socket.off("chat:message", handler);

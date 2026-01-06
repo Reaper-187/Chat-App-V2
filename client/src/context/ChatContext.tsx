@@ -63,6 +63,9 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     const newMessage: Message = {
       messageId: crypto.randomUUID(),
       sender: user,
+      recipientUserId: activeChat.participants.find(
+        (p) => p.userId !== user?.userId
+      )?.userId!,
       content,
       timestamp: new Date(),
     };
@@ -75,8 +78,9 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     // Socket senden
     sendMessageSocket({
       chatId: activeChat.chatId!,
-      recipient: activeChat.participants.find((p) => p.userId !== user?.userId)
-        ?.userId!,
+      recipientUserId: activeChat.participants.find(
+        (p) => p.userId !== user.userId
+      )?.userId!,
       content,
     });
   };

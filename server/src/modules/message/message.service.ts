@@ -6,19 +6,20 @@ import { Message } from "./message.model";
 
 interface SendMessagesFuncProps {
   senderId: string;
-  recipientId: string;
+  recipientUserId: string;
   content: string;
 }
 export async function saveSendMessage({
   senderId,
-  recipientId,
+  recipientUserId,
   content,
 }: SendMessagesFuncProps): Promise<{
   chatId: string;
   message: SendMessagesFuncProps;
 }> {
   const findReceivedUser =
-    (await User.findById(recipientId)) || (await Guest.findById(recipientId));
+    (await User.findById(recipientUserId)) ||
+    (await Guest.findById(recipientUserId));
 
   if (!senderId || !findReceivedUser) {
     throw new Error("No sender or recipient found");
@@ -26,7 +27,7 @@ export async function saveSendMessage({
 
   let chat = await Chat.findOne({
     participants: {
-      $all: [senderId, recipientId].map(
+      $all: [senderId, recipientUserId].map(
         (id) => new mongoose.Types.ObjectId(id)
       ),
     },
@@ -34,7 +35,7 @@ export async function saveSendMessage({
 
   if (!chat) {
     chat = await Chat.create({
-      participants: [senderId, recipientId].map(
+      participants: [senderId, recipientUserId].map(
         (id) => new mongoose.Types.ObjectId(id)
       ),
     });
@@ -43,7 +44,7 @@ export async function saveSendMessage({
   const newMessageDoc = new Message({
     chatId: chat._id,
     senderId,
-    recipientId,
+    recipientUserId,
     content,
   });
 
@@ -51,7 +52,7 @@ export async function saveSendMessage({
 
   const newMessage: SendMessagesFuncProps = {
     senderId,
-    recipientId,
+    recipientUserId,
     content,
   };
 

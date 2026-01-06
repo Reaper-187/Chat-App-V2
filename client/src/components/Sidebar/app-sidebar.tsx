@@ -17,10 +17,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { getChat } from "@/service/chatService";
 import { useAuth } from "@/context/AuthContext";
+import { SearchInput } from "../SearchInput/SearchInput";
 
 export function AppSidebar() {
   const [chatContacts, setChatContacts] = useState<User[]>([]); // State für Contacts
-  const { setActiveChat } = useChat();
+  const { handleActiveChat } = useChat();
   const { user } = useAuth();
 
   const { data, isLoading, error } = useQuery({
@@ -30,7 +31,6 @@ export function AppSidebar() {
 
   useEffect(() => {
     if (data?.chats) {
-      // Wandeln wir die Chat-Daten in ein User-Array für die Sidebar
       const contactsFromChats: User[] = data.chats.map((chat: any) => {
         const contact = chat.participants.find(
           (p: any) => p._id !== user?.userId
@@ -41,19 +41,13 @@ export function AppSidebar() {
           lastName: contact.lastName,
           avatarUrl: contact.avatarUrl,
           online: contact.online,
+          userRole: contact.userRole,
+          isAuthenticated: true,
         };
       });
       setChatContacts(contactsFromChats);
     }
   }, [data]);
-
-  const handleActiveChat = (contact: User) => {
-    setActiveChat({
-      chatId: null,
-      participants: [user, contact],
-      messages: [],
-    });
-  };
 
   if (isLoading) return <p>Loading chats...</p>;
   if (error) return <p>Error loading chats</p>;
@@ -62,6 +56,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader>
         <SidebarSwitcher />
+        <SearchInput />
         <h2 className="px-4 py-2 text-lg font-semibold">Chats</h2>
       </SidebarHeader>
       <SidebarContent>

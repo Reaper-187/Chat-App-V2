@@ -11,10 +11,11 @@ import { useQuery } from "@tanstack/react-query";
 import { getMessages } from "@/service/chatService";
 import { useSocket } from "./SocketContext";
 import { useAuth } from "./AuthContext";
+import type { User } from "@/types/User";
 
 interface ChatContextType {
   activeChat: Chat | null;
-  setActiveChat: React.Dispatch<React.SetStateAction<Chat | null>>;
+  handleActiveChat: (contact: User) => void;
   handleSendMessage: (content: string) => void;
 }
 
@@ -22,6 +23,7 @@ const ChatContext = createContext<ChatContextType | null>(null);
 
 export const ChatProvider = ({ children }: { children: ReactNode }) => {
   const { setIncomingHandler, sendMessageSocket } = useSocket();
+  const { user } = useAuth();
 
   const [activeChat, setActiveChat] = useState<Chat | null>(null);
 
@@ -30,6 +32,17 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     queryFn: () => getMessages(activeChat!.chatId!),
     enabled: !!activeChat?.chatId,
   });
+
+  const handleActiveChat = (contact: User) => {
+    if (!user) {
+      return alert("Connection Failed");
+    }
+    setActiveChat({
+      chatId: null,
+      participants: [user, contact],
+      messages: [],
+    });
+  };
 
   useEffect(() => {
     if (!data || !activeChat) return;
@@ -43,8 +56,6 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         : prev
     );
   }, [data]);
-
-  const { user } = useAuth();
 
   const handleSendMessage = (content: string) => {
     if (!activeChat || !user) return;
@@ -86,7 +97,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <ChatContext.Provider
-      value={{ activeChat, setActiveChat, handleSendMessage }}
+      value={{ activeChat, handleActiveChat, handleSendMessage }}
     >
       {children}
     </ChatContext.Provider>

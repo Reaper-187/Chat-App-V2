@@ -15,7 +15,7 @@ import type { User } from "@/types/User";
 
 interface ChatContextType {
   activeChat: Chat | null;
-  handleActiveChat: (contact: User) => void;
+  handleActiveChat: (chat: Chat | User) => void;
   handleSendMessage: (content: string) => void;
 }
 
@@ -27,21 +27,28 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
   const [activeChat, setActiveChat] = useState<Chat | null>(null);
 
+  console.log(activeChat?.chatId, "ist ok oder nok");
+
   const { data, isLoading } = useQuery({
     queryKey: ["messages", activeChat?.chatId],
-    queryFn: () => getMessages(activeChat!.chatId!),
+    queryFn: () => getMessages(activeChat?.chatId!),
     enabled: !!activeChat?.chatId,
   });
 
-  const handleActiveChat = (contact: User) => {
-    if (!user) {
-      return alert("Connection Failed");
+  const handleActiveChat = (data: Chat | User) => {
+    if ("chatId" in data) {
+      if (activeChat?.chatId === data.chatId) return;
+      setActiveChat(data);
     }
-    setActiveChat({
-      chatId: null,
-      participants: [user, contact],
-      messages: [],
-    });
+    // Wenn es ein User ist wird ein neuer Chat erstellen
+    else {
+      const newChat: Chat = {
+        chatId: null,
+        participants: [user!, data],
+        messages: [],
+      };
+      setActiveChat(newChat);
+    }
   };
 
   useEffect(() => {
@@ -62,7 +69,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
     const newMessage: Message = {
       messageId: crypto.randomUUID(),
-      sender: user,
+      sender: user.userId,
       recipientUserId: activeChat.participants.find(
         (p) => p.userId !== user?.userId
       )?.userId!,

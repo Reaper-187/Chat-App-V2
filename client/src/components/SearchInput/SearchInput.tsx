@@ -1,11 +1,12 @@
 import { useEffect, useState, type ChangeEvent } from "react";
 import { Input } from "../ui/input";
 import { useQuery } from "@tanstack/react-query";
-import { getAllContacts } from "@/service/chatService";
+import { getSearchContacts } from "@/service/chatService";
 import type { User } from "@/types/User";
 import { useDebounce } from "@/hooks/Debouncer/useBouncer";
 import { useChat } from "@/context/ChatContext";
 import { useAuth } from "@/context/AuthContext";
+import type { Chat } from "@/types/Chat";
 
 export const SearchInput = () => {
   const { user } = useAuth();
@@ -22,7 +23,7 @@ export const SearchInput = () => {
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["contact"],
-    queryFn: getAllContacts,
+    queryFn: getSearchContacts,
   });
 
   useEffect(() => {
@@ -61,7 +62,7 @@ export const SearchInput = () => {
               key={contact.userId}
               className="p-2 flex justify-end hover:bg-gray-100 cursor-pointer"
               onClick={() => {
-                handleActiveChat(contact);
+                handleActiveChat(contact as Chat | User);
               }}
             >
               <p>

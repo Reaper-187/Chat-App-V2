@@ -11,13 +11,32 @@ exports.getAllChats = async (
     const { userId } = req.session;
 
     const findAllRooms = await Chat.find({ participants: userId })
-      .populate("participants", "firstName lastName avatarUrl online") // sofort daten für die UI
-      .sort({ updatedAt: -1 }); // zegit letzten kontakt zuerst an
+      .populate("participants", "firstName lastName avatarUrl online")
+      .sort({ updatedAt: -1 });
 
-    if (!findAllRooms)
+    if (!findAllRooms || findAllRooms.length === 0) {
       return res.status(401).json({ message: "no Chats in History" });
+    }
 
-    res.status(200).json({ chats: findAllRooms });
+    const chatsWithChatId = findAllRooms.map((chat) => {
+      const chatObj = chat.toObject();
+
+      return {
+        ...chatObj,
+        chatId: chatObj._id.toString(),
+        participants: chatObj.participants.map((p: any) => ({
+          userId: p._id.toString(),
+          firstName: p.firstName,
+          lastName: p.lastName,
+          avatarUrl: p.avatarUrl,
+          online: p.online,
+          userRole: p.userRole,
+          isAuthenticated: true,
+        })),
+      };
+    });
+
+    res.status(200).json({ chats: chatsWithChatId });
   } catch (err) {
     res.status(500).json({ message: "Server Fehler", err });
   }

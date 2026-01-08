@@ -27,8 +27,6 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
   const [activeChat, setActiveChat] = useState<Chat | null>(null);
 
-  console.log(activeChat?.chatId, "ist ok oder nok");
-
   const { data, isLoading } = useQuery({
     queryKey: ["messages", activeChat?.chatId],
     queryFn: () => getMessages(activeChat?.chatId!),
@@ -53,7 +51,6 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (!data || !activeChat) return;
-
     setActiveChat((prev) =>
       prev
         ? {
@@ -62,7 +59,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
           }
         : prev
     );
-  }, [data]);
+  }, [data, activeChat?.chatId]);
 
   const handleSendMessage = (content: string) => {
     if (!activeChat || !user) return;

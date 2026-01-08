@@ -10,6 +10,7 @@ export const ChatScreen = () => {
   const otherUser = activeChat?.participants.find(
     (u) => u.userId !== user?.userId
   );
+  console.log(activeChat);
 
   return (
     <>
@@ -20,7 +21,10 @@ export const ChatScreen = () => {
       ) : (
         <div className="flex flex-col h-full max-h-screen">
           <ChatHeader user={otherUser} />
-          <ChatMessages messages={activeChat?.messages} />
+          <ChatMessages
+            participants={activeChat?.participants}
+            messages={activeChat?.messages}
+          />
           <ChatInput />
         </div>
       )}

@@ -46,7 +46,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
         incomingHandlerRef.current(message);
       }
     };
-
+    socket.on("chat:message", handler);
     return () => {
       socket.off("chat:message", handler);
     };

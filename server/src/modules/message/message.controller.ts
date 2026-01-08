@@ -10,16 +10,16 @@ exports.sendMessage = async (
 ) => {
   try {
     const { userId } = req.session;
-    const { receiverId, content } = req.body;
+    const { newMessage } = req.body;
 
-    if (!userId || !receiverId || !content) {
+    if (!userId || !newMessage.recipientUserId || !newMessage.content) {
       return res.status(400).json({ message: "Invalid request data" });
     }
 
     await saveSendMessage({
-      senderId: userId,
-      recipientId: receiverId,
-      content,
+      sender: userId,
+      recipientUserId: newMessage.recipientUserId,
+      content: newMessage.content,
     });
 
     res.status(200).json({ message: "Message saved" });
@@ -36,11 +36,9 @@ exports.getMessage = async (
   try {
     const { userId } = req.session;
     const { chatId: _id } = req.params;
-
     if (!userId) return res.status(401).json({ message: "Internal Error" });
 
     const findChat = await Chat.findOne({ _id });
-
     if (!findChat) return res.status(403).json({ message: "not possible" });
 
     const isUserParticipant = findChat.participants

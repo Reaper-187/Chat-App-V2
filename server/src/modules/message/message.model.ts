@@ -2,14 +2,14 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 interface MessageProps extends Document {
   chatId: mongoose.Types.ObjectId;
-  senderId: mongoose.Types.ObjectId;
+  sender: mongoose.Types.ObjectId;
   content: string;
   timeStamp: Date;
 }
 
 const messageSchema = new Schema<MessageProps>({
   chatId: String,
-  senderId: {
+  sender: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
   },

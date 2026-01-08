@@ -87,17 +87,13 @@ export function initSocket(server: HttpServer) {
 
     // Chat-Event
     s.on("chat:message", async (payload: SendMessageProps) => {
-      console.log("Received chat:message:", payload);
-
-      const { chatId, message } = await saveSendMessage({
-        senderId: userId,
+      const { message } = await saveSendMessage({
+        sender: userId,
         recipientUserId: payload.recipientUserId,
         content: payload.content,
       });
-
       const recipientSocket = users.get(payload.recipientUserId);
-      if (recipientSocket)
-        recipientSocket.emit("chat:message", { chatId, message });
+      if (recipientSocket) recipientSocket.emit("chat:message", message);
     });
   });
 

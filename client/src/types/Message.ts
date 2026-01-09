@@ -5,5 +5,5 @@ export interface Message {
   sender: User["userId"];
   recipientUserId: User["userId"];
   content: string;
-  timestamp: Date;
+  timeStamp: Date;
 }

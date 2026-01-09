@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import { io, Socket } from "socket.io-client";
+import { useAuth } from "./AuthContext";
 
 interface SocketContextType {
   sendMessageSocket: (payloade: SendMessage) => void;
@@ -23,10 +24,12 @@ interface SendMessage {
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
 
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
+  const { user } = useAuth();
   const socketRef = useRef<Socket | null>(null);
   const incomingHandlerRef = useRef<((message: Message) => void) | null>(null);
 
   useEffect(() => {
+    if (!user) return;
     socketRef.current = io("http://localhost:5000", {
       withCredentials: true,
     });
@@ -35,7 +38,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [user?.isAuthenticated]);
 
   useEffect(() => {
     const socket = socketRef.current;

@@ -4,14 +4,10 @@ import { useAuth } from "@/context/AuthContext";
 import type { Chat } from "@/types/Chat";
 
 interface ChatMessagesProps {
-  participants?: Chat["participants"];
   messages?: Chat["messages"];
 }
 
-export const ChatMessages = ({
-  participants = [],
-  messages = [],
-}: ChatMessagesProps) => {
+export const ChatMessages = ({ messages = [] }: ChatMessagesProps) => {
   const { user } = useAuth();
   if (!messages || !user) return null;
   const endRef = useRef<HTMLDivElement>(null);
@@ -26,6 +22,15 @@ export const ChatMessages = ({
         {messages.map((message, index) => {
           // Prüfe, wer der Absender der Nachricht ist
           const isFromMe = message.sender === user.userId;
+          const timeLine =
+            message.timeStamp &&
+            new Date(message.timeStamp).toLocaleDateString([], {
+              weekday: "short",
+              day: "numeric",
+              month: "short",
+            });
+          console.log("timeLine", timeLine);
+
           return (
             <div
               key={index}
@@ -33,32 +38,22 @@ export const ChatMessages = ({
             >
               <div className={`max-w-[85%] md:max-w-[70%]`}>
                 <div
-                  className={`rounded-2xl px-4 py-3 ${
+                  className={`rounded-2xl px-4 py-3 flex flex-col ${
                     isFromMe
-                      ? "bg-primary text-primary-foreground rounded-br-none"
+                      ? "bg-primary text-primary-foreground rounded-br-none items-end"
                       : "bg-muted rounded-bl-none"
                   }`}
                 >
                   <p className="text-sm md:text-base">{message.content}</p>
+
                   <p className="text-xs mt-1 opacity-70">
-                    {message.timestamp &&
-                      new Date(message.timestamp).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
+                    {message.timeStamp &&
+                      new Date(message.timeStamp).toLocaleDateString([], {
+                        weekday: "short",
+                        day: "numeric",
+                        month: "short",
                       })}
                   </p>
-                </div>
-                <div
-                  className={`text-xs text-muted-foreground mt-1 px-2 ${
-                    isFromMe ? "text-right" : "text-left"
-                  }`}
-                >
-                  {message.timestamp &&
-                    new Date(message.timestamp).toLocaleDateString([], {
-                      weekday: "short",
-                      day: "numeric",
-                      month: "short",
-                    })}
                 </div>
               </div>
             </div>

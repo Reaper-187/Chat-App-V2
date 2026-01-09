@@ -10,7 +10,7 @@ export const ChatHeader = ({ user }: { user?: User }) => {
   return (
     <header className="p-4 border-b bg-card shrink-0">
       <div className="flex items-center gap-3" key={userId}>
-        <Avatar className="h-10 w-10">
+        <Avatar className="h-10 w-10 rounded-full border-1 border-black flex items-center justify-center">
           <AvatarImage src={avatarUrl} />
           <AvatarFallback>
             {firstName[0]}

@@ -71,7 +71,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         (p) => p.userId !== user?.userId
       )?.userId!,
       content,
-      timestamp: new Date(),
+      timeStamp: new Date(),
     };
 
     setActiveChat((prev) => {

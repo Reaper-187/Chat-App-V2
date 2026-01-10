@@ -79,7 +79,7 @@ export const Register = () => {
   const passwordChecks = checkPasswordCriteria(watch("password"));
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center p-4 bg-[url(/public/r2.jpg)] bg-cover ">
+    <div className="w-full min-h-screen flex items-center justify-center p-4 bg-cover">
       <Card className="w-full md:w-1/2 lg:w-1/3 bg-card/80 backdrop-blur-md">
         <CardHeader>
           <CardTitle className="flex justify-self-center text-2xl md:text-3xl lg:text-4xl">

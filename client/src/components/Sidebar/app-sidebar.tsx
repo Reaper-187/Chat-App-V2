@@ -19,6 +19,8 @@ import { useAuth } from "@/context/AuthContext";
 import { SearchInput } from "../SearchInput/SearchInput";
 import type { Chat } from "@/types/Chat";
 import { Spinner } from "../Spinner/Spinner";
+import { Settings } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function AppSidebar() {
   const [chatState, setChatState] = useState<{ chats: Chat[] } | null>(null);
@@ -52,7 +54,15 @@ export function AppSidebar() {
       <SidebarHeader>
         <SidebarSwitcher />
         <SearchInput />
-        <h2 className="px-4 py-2 text-lg font-semibold">Chats</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="px-4 py-2 text-lg font-semibold">Chats</h2>
+          <Link to={"/settings"}>
+            <Settings
+              size={20}
+              className="transition duration-300 cursor-pointer hover:scale-120 hover:rotate-180"
+            />
+          </Link>
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

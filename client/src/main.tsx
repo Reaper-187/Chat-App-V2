@@ -18,6 +18,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PublicRoute } from "./hooks/ProtectedRoutes/PublicRoute.tsx";
 import { ProtectedRoute } from "./hooks/ProtectedRoutes/ProtectedRoute.tsx";
 import { SocketProvider } from "./context/SocketContext.tsx";
+import { Settings } from "./pages/Settings/Settings.tsx";
 const queryClient = new QueryClient();
 
 // {
@@ -87,6 +88,10 @@ const router = createBrowserRouter([
       {
         path: "chat",
         element: <ChatScreen />,
+      },
+      {
+        path: "settings",
+        element: <Settings />,
       },
     ],
   },

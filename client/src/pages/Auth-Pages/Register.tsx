@@ -48,13 +48,15 @@ export const Register = () => {
     },
   });
 
-  const { mutate } = useRegister();
+  const { mutate, isPending: registLoad } = useRegister();
 
-  const { mutate: guestLogin } = guestAccessHook();
+  const { mutate: guestLogin, isPending: guestLoginLoad } = guestAccessHook();
 
   const handleRegister = (data: FormRegister) => {
     mutate(data);
   };
+
+  const noCheck = registLoad || guestLoginLoad;
 
   const checkPasswordCriteria = (password: string = "") => {
     return {
@@ -148,9 +150,10 @@ export const Register = () => {
               <p className="text-red-600">{errors.password.message}</p>
             )}
           </div>
-          <Link to={"#"}>forgot password</Link>
           <div className="w-full grid grid-cols-2 gap-4">
-            <Button className="w-full">Registration</Button>
+            <Button disabled={noCheck ? true : false} className="w-full">
+              {noCheck ? "please wait..." : "Registration"}
+            </Button>
             <Button className="w-full">
               <Link className="w-full" to={"/login"}>
                 Switch to Login
@@ -172,9 +175,10 @@ export const Register = () => {
           <Button
             className="w-full col-span-2 font-semibold"
             onClick={() => guestLogin()}
+            disabled={noCheck ? true : false}
           >
             <User className="mr-2 h-4 w-4" />
-            Guest for Test
+            {guestLoginLoad ? "Guest-Access is creating..." : "Guest for Test"}
           </Button>
         </div>
       </Card>

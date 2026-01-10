@@ -10,7 +10,6 @@ export const ChatScreen = () => {
   const otherUser = activeChat?.participants.find(
     (u) => u.userId !== user?.userId
   );
-  console.log(activeChat);
 
   return (
     <>

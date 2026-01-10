@@ -37,13 +37,15 @@ export const Login = () => {
     },
   });
 
-  const { mutate: userLogin } = useLogin();
+  const { mutate: userLogin, isPending: loginLoad } = useLogin();
 
-  const { mutate: guestLogin } = guestAccessHook();
+  const { mutate: guestLogin, isPending: guestLoginLoad } = guestAccessHook();
 
   const handleLogin = (data: FormLogin) => {
     userLogin(data);
   };
+
+  const noCheck = loginLoad || guestLoginLoad;
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center p-4">
@@ -90,14 +92,17 @@ export const Login = () => {
             )}
           </div>
           <Link
+            hidden={noCheck ? true : false}
             className="text-blue-400 hover:text-blue-500 font-medium"
             to={"/reset-password-authentication"}
           >
             forgot password
           </Link>
           <div className="w-full grid grid-cols-2 gap-4">
-            <Button className="w-full">Sign in</Button>
-            <Button className="w-full">
+            <Button disabled={noCheck ? true : false} className="w-full">
+              {loginLoad ? "in Progress..." : "Sign in"}
+            </Button>
+            <Button disabled={noCheck ? true : false} className="w-full">
               <Link className="w-full" to={"/register"}>
                 Switch to Register
               </Link>
@@ -116,11 +121,12 @@ export const Login = () => {
         </form>
         <div className="grid grid-cols-2 gap-4 px-4 ">
           <Button
+            disabled={noCheck ? true : false}
             className="w-full col-span-2 font-semibold"
             onClick={() => guestLogin()}
           >
             <User className="mr-2 h-4 w-4" />
-            Guest for Test
+            {guestLoginLoad ? "Guest-Access is creating..." : "Guest for Test"}
           </Button>
         </div>
       </Card>

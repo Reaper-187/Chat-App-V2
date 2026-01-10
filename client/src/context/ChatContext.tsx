@@ -15,6 +15,7 @@ import type { User } from "@/types/User";
 
 interface ChatContextType {
   activeChat: Chat | null;
+  isLoading: boolean;
   handleActiveChat: (chat: Chat | User) => void;
   handleSendMessage: (content: string) => void;
 }
@@ -105,7 +106,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <ChatContext.Provider
-      value={{ activeChat, handleActiveChat, handleSendMessage }}
+      value={{ activeChat, handleActiveChat, handleSendMessage, isLoading }}
     >
       {children}
     </ChatContext.Provider>

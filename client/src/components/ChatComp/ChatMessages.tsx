@@ -2,35 +2,57 @@ import { useEffect, useRef } from "react";
 import { ScrollArea } from "../ui/scroll-area";
 import { useAuth } from "@/context/AuthContext";
 import type { Chat } from "@/types/Chat";
+import { Spinner } from "../Spinner/Spinner";
 
 interface ChatMessagesProps {
   messages?: Chat["messages"];
+  isLoading: boolean;
 }
 
-export const ChatMessages = ({ messages = [] }: ChatMessagesProps) => {
+export const ChatMessages = ({
+  messages = [],
+  isLoading = false,
+}: ChatMessagesProps) => {
   const { user } = useAuth();
-  if (!messages || !user) return null;
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  if (isLoading) {
+    return (
+      <ScrollArea className="flex-1 min-h-0 p-4 overflow-y-auto">
+        <div className="h-full flex items-center justify-center">
+          <div>
+            <Spinner />
+          </div>
+          <div>
+            <p className="text-muted-foreground">loading chat conversation</p>
+          </div>
+        </div>
+      </ScrollArea>
+    );
+  }
+
+  // Wenn kein User, nichts anzeigen
+  if (!user) return null;
+
+  if (messages.length === 0) {
+    return (
+      <ScrollArea className="flex-1 min-h-0 p-4 overflow-y-auto">
+        <div className="h-full flex items-center justify-center">
+          <p className="text-muted-foreground">start conversation</p>
+        </div>
+      </ScrollArea>
+    );
+  }
+
   return (
     <ScrollArea className="flex-1 min-h-0 p-4 overflow-y-auto">
       <div className="space-y-4 pb-4">
         {messages.map((message, index) => {
-          // Prüfe, wer der Absender der Nachricht ist
           const isFromMe = message.sender === user.userId;
-          const timeLine =
-            message.timeStamp &&
-            new Date(message.timeStamp).toLocaleDateString([], {
-              weekday: "short",
-              day: "numeric",
-              month: "short",
-            });
-          console.log("timeLine", timeLine);
-
           return (
             <div
               key={index}
@@ -45,7 +67,6 @@ export const ChatMessages = ({ messages = [] }: ChatMessagesProps) => {
                   }`}
                 >
                   <p className="text-sm md:text-base">{message.content}</p>
-
                   <p className="text-xs mt-1 opacity-70">
                     {message.timeStamp &&
                       new Date(message.timeStamp).toLocaleDateString([], {

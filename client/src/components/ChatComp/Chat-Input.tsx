@@ -4,7 +4,11 @@ import { Input } from "../ui/input";
 import { useState } from "react";
 import { useChat } from "@/context/ChatContext";
 
-export const ChatInput = () => {
+interface ChatInputProps {
+  isLoading: boolean;
+}
+
+export const ChatInput = ({ isLoading }: ChatInputProps) => {
   const { handleSendMessage } = useChat();
 
   const [newMessage, setNewMessage] = useState("");
@@ -32,6 +36,7 @@ export const ChatInput = () => {
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyDown={handleKeyPress}
           className="flex-1 text-base"
+          disabled={isLoading ? true : false}
         />
         <Button
           disabled={!newMessage.trim()}

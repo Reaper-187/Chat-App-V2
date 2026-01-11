@@ -8,6 +8,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { SidebarSwitcher } from "./SidebarSwitcher";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -20,9 +21,14 @@ import { SearchInput } from "../SearchInput/SearchInput";
 import type { Chat } from "@/types/Chat";
 import { Spinner } from "../Spinner/Spinner";
 import { Settings } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useSocket } from "@/context/SocketContext";
 
 export function AppSidebar() {
+  const { onlineStatOfUsers } = useSocket();
+  console.log("onlineStatOfUsers Sidebar", onlineStatOfUsers);
+
+  const { setOpenMobile } = useSidebar();
   const [chatState, setChatState] = useState<{ chats: Chat[] } | null>(null);
   const { handleActiveChat } = useChat();
   const { user } = useAuth();
@@ -38,15 +44,18 @@ export function AppSidebar() {
     }
   }, [data]);
 
+  const navigate = useNavigate();
+
   const handleOpenChat = (userId: string) => {
     if (!chatState?.chats) return;
-
+    navigate("/chat");
     const chatObj = chatState.chats.find((chat) =>
       chat.participants.some((p: any) => p.userId === userId)
     );
 
     if (!chatObj) return;
     handleActiveChat(chatObj);
+    setOpenMobile(false);
   };
 
   return (
@@ -56,7 +65,7 @@ export function AppSidebar() {
         <SearchInput />
         <div className="flex items-center justify-between">
           <h2 className="px-4 py-2 text-lg font-semibold">Chats</h2>
-          <Link to={"/settings"}>
+          <Link to={"/settings"} onClick={() => setOpenMobile(false)}>
             <Settings
               size={20}
               className="transition duration-300 cursor-pointer hover:scale-120 hover:rotate-180"
@@ -95,7 +104,9 @@ export function AppSidebar() {
                           </Avatar>
                           <div
                             className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-background ${
-                              contact.online ? "bg-green-500" : "bg-red-500"
+                              onlineStatOfUsers.includes(contact.userId)
+                                ? "bg-green-500"
+                                : "bg-red-500"
                             }`}
                           />
                         </div>

@@ -36,6 +36,7 @@ const wrap =
   };
 
 const users = new Map<string, Socket>();
+const disconnectTimeouts = new Map<string, NodeJS.Timeout>();
 
 export function initSocket(server: HttpServer) {
   const io = new Server(server, {
@@ -72,18 +73,43 @@ export function initSocket(server: HttpServer) {
 
     console.log("User Connected:", userId);
 
-    // Alte Verbindung trennen
-    const existingSocket = users.get(userId);
-    if (existingSocket) existingSocket.disconnect();
+    const existingTimeout = disconnectTimeouts.get(userId);
+    if (existingTimeout) {
+      clearTimeout(existingTimeout);
+      disconnectTimeouts.delete(userId);
+    }
 
-    // Neue Verbindung setzen
+    // Alte Verbindung trennen, falls vorhanden
+    const existingSocket = users.get(userId);
+    if (existingSocket && existingSocket.id !== s.id) {
+      existingSocket.disconnect();
+    }
+
     users.set(userId, s);
 
-    // Disconnect sauber handhaben
+    const onlineUsers: string[] = [...users.keys()];
+
     s.on("disconnect", () => {
-      if (users.get(userId) === s) users.delete(userId);
-      console.log("User Disconnected:", userId);
+      const disconnectTimeout = setTimeout(() => {
+        // Prüfen ob User die gleiche Socket-conne hat
+        if (users.get(userId) === s) {
+          users.delete(userId);
+          const onlineUsersAfterDis: string[] = [...users.keys()];
+          io.emit("users:online", onlineUsersAfterDis);
+        }
+
+        // Timeout entfernen
+        disconnectTimeouts.delete(userId);
+      }, 3000);
+
+      // Timeout speichern
+      disconnectTimeouts.set(userId, disconnectTimeout);
     });
+
+    console.log("disconnectTimeouts", disconnectTimeouts);
+
+    socket.broadcast.emit("users:online", onlineUsers);
+    socket.emit("users:online", onlineUsers);
 
     // Chat-Event
     s.on("chat:message", async (payload: SendMessageProps) => {

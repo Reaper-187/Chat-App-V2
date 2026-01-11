@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useRef,
+  useState,
   type ReactNode,
 } from "react";
 
@@ -13,6 +14,7 @@ import { useAuth } from "./AuthContext";
 interface SocketContextType {
   sendMessageSocket: (payloade: SendMessage) => void;
   setIncomingHandler: (fn: (message: Message) => void) => void;
+  onlineStatOfUsers: string[];
 }
 
 interface SendMessage {
@@ -27,6 +29,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
   const socketRef = useRef<Socket | null>(null);
   const incomingHandlerRef = useRef<((message: Message) => void) | null>(null);
+  const [onlineStatOfUsers, setOnlineStatOfUsers] = useState<string[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -34,6 +37,11 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       withCredentials: true,
     });
     const socket = socketRef.current;
+
+    const statusHandler = (onlineUsers: string[]) => {
+      setOnlineStatOfUsers(onlineUsers);
+    };
+    socket.on("users:online", statusHandler);
 
     return () => {
       socket.disconnect();
@@ -44,14 +52,15 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     const socket = socketRef.current;
     if (!socket) return;
 
-    const handler = (message: Message) => {
+    const messagehandler = (message: Message) => {
       if (incomingHandlerRef.current) {
         incomingHandlerRef.current(message);
       }
     };
-    socket.on("chat:message", handler);
+
+    socket.on("chat:message", messagehandler);
     return () => {
-      socket.off("chat:message", handler);
+      socket.off("chat:message", messagehandler);
     };
   }, []);
 
@@ -64,7 +73,9 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <SocketContext.Provider value={{ sendMessageSocket, setIncomingHandler }}>
+    <SocketContext.Provider
+      value={{ sendMessageSocket, setIncomingHandler, onlineStatOfUsers }}
+    >
       {children}
     </SocketContext.Provider>
   );

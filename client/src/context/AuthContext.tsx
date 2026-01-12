@@ -43,7 +43,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         userRole: data?.userInfo.userRole,
         firstName: data?.userInfo.firstName,
         lastName: data?.userInfo.lastName,
-        online: data.userInfo.online,
       });
       setLoadingSpinner("authenticated");
     }

@@ -21,7 +21,6 @@ exports.userInfo = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const isAuthenticated = !!user;
-
     const userInfo = {
       userId: _id,
       firstName: user.firstName,

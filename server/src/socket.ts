@@ -105,9 +105,6 @@ export function initSocket(server: HttpServer) {
       // Timeout speichern
       disconnectTimeouts.set(userId, disconnectTimeout);
     });
-
-    console.log("disconnectTimeouts", disconnectTimeouts);
-
     socket.broadcast.emit("users:online", onlineUsers);
     socket.emit("users:online", onlineUsers);
 

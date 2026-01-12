@@ -6,7 +6,6 @@ export interface User {
   avatarUrl?: string;
   userRole: UserRole;
   isAuthenticated: boolean;
-  online: boolean;
 }
 
 export interface UserInfoResponse {
@@ -18,6 +17,5 @@ export interface UserInfoResponse {
     avatarUrl?: string;
     userRole: UserRole;
     isAuthenticated: boolean;
-    online: boolean;
   };
 }

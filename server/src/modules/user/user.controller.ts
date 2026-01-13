@@ -3,7 +3,11 @@ import { User } from "./user.model";
 import bcrypt from "bcrypt";
 import { Guest } from "../guest/guest.model";
 import { cleanupGuestData } from "../../middleware/guest.auth.middleware";
-// import crypto from "crypto";
+import nodemailer from "nodemailer";
+import crypto from "crypto";
+
+const EMAIL_USER = process.env.EMAIL_USER;
+const EMAIL_PASS = process.env.EMAIL_PASS;
 
 exports.userInfo = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -52,8 +56,8 @@ exports.registUser = async (req: Request, res: Response) => {
 
     const hashedPw = await bcrypt.hash(password, 10);
 
-    // const verificationToken = crypto.randomBytes(32).toString("hex");
-    // const tokenExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 Stunden gültig
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    const tokenExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 Stunden gültig
 
     const newUser = new User({
       ...user,
@@ -61,35 +65,35 @@ exports.registUser = async (req: Request, res: Response) => {
       lastName,
       email,
       password: hashedPw,
-      // verification: {
-      //   veryfiStatus: false,
-      //   veryficationToken: verificationToken,
-      //   verifyTokenExp: tokenExpires,
-      // },
+      verification: {
+        veryfiStatus: false,
+        veryficationToken: verificationToken,
+        verifyTokenExp: tokenExpires,
+      },
     });
 
     await newUser.save();
 
-    // const verifyLink = `${process.env.FRONTEND_URL}/emailVerify?token=${verificationToken}`;
+    const verifyLink = `${process.env.FRONTEND_URL}/emailVerify?token=${verificationToken}`;
 
-    // const transporter = nodemailer.createTransport({
-    //   host: "smtp.gmail.com",
-    //   port: 465,
-    //   secure: true,
-    //   auth: {
-    //     user: EMAIL_USER,
-    //     pass: EMAIL_PASS,
-    //   },
-    // });
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: EMAIL_USER,
+        pass: EMAIL_PASS,
+      },
+    });
 
-    // await transporter.sendMail({
-    //   from: EMAIL_USER,
-    //   to: email,
-    //   subject: "E-Mail-Verification",
-    //   text: `Please click on the current Link, to verify your E-Mail: ${verifyLink}`,
-    //   html: `<p>Please click on the current Link, to verify your E-Mail:</p>
-    //          <a href="${verifyLink}">${verifyLink}</a>`,
-    // });
+    await transporter.sendMail({
+      from: EMAIL_USER,
+      to: email,
+      subject: "E-Mail-Verification",
+      text: `Please click on the current Link, to verify your E-Mail: ${verifyLink}`,
+      html: `<p>Please click on the current Link, to verify your E-Mail:</p>
+             <a href="${verifyLink}">${verifyLink}</a>`,
+    });
 
     res.status(200).json({
       message:

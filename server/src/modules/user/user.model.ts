@@ -14,9 +14,9 @@ interface UserType extends Document {
     blocked: boolean;
   };
   verification: {
-    veryfiStatus: boolean;
-    veryficationToken: string;
-    verifyTokenExp: Date;
+    verifiStatus: boolean;
+    verificationToken: string | null;
+    verifyTokenExp: Date | null;
   };
   otp: {
     otpNum: number;
@@ -26,11 +26,10 @@ interface UserType extends Document {
 }
 
 const verificationSchema = new Schema({
-  veryfiStatus: { type: Boolean, default: false },
-  veryficationToken: { type: String },
-  verifyTokenExp: { type: Date },
+  verifiStatus: { type: Boolean, default: false },
+  verificationToken: { type: String, default: null },
+  verifyTokenExp: { type: Date, default: null },
 });
-
 const blockedAccountSchema = {
   wrongPwCounter: { type: Number, default: 0 },
   blocked: { type: Boolean, default: false },

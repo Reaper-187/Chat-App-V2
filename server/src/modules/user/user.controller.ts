@@ -66,8 +66,8 @@ exports.registUser = async (req: Request, res: Response) => {
       email,
       password: hashedPw,
       verification: {
-        veryfiStatus: false,
-        veryficationToken: verificationToken,
+        verifiStatus: false,
+        verificationToken: verificationToken,
         verifyTokenExp: tokenExpires,
       },
     });
@@ -102,6 +102,45 @@ exports.registUser = async (req: Request, res: Response) => {
   } catch (err) {
     console.error("Error ", err);
     res.status(500).json({ message: "Server Error" });
+  }
+};
+
+exports.emailVerify = async (req: Request, res: Response) => {
+  const { token } = req.query;
+
+  try {
+    const verificationToken = Array.isArray(token) ? token[0] : token;
+    // Benutzer mit dem Token finden
+    const user = await User.findOne({
+      "verification.verificationToken": verificationToken,
+    });
+
+    if (!user) {
+      return res.status(400).send("Token is wrong or expired.");
+    }
+
+    if (
+      user.verification.verifyTokenExp &&
+      user.verification.verifyTokenExp < new Date()
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Token is expired.",
+      });
+    }
+
+    // Benutzer verifizieren
+    user.verification.verifiStatus = true;
+    user.verification.verificationToken = null; // Token entfernen
+    user.verification.verifyTokenExp = null; // Ablaufdatum entfernen
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "E-Mail verified successfully! Now you can Sign-in.",
+    });
+  } catch (err) {
+    res.status(500).send("Intern Server-Error.");
   }
 };
 

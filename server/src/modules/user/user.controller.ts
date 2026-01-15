@@ -155,15 +155,15 @@ exports.loginUser = async (req: Request, res: Response) => {
     if (!findUserAccount)
       return res.status(400).json({ message: "wrong email or password" });
 
-    // if (await findUserAccount.blockedAccount.blocked)
-    //   return res.status(400).json({
-    //     message: "Your Account is blocked apply to the Admin",
-    //   });
+    if (findUserAccount.blockedAccount.blocked)
+      return res.status(400).json({
+        message: "Your Account is blocked apply to the Admin",
+      });
 
     const comparedPw = await bcrypt.compare(password, findUserAccount.password);
 
     if (!comparedPw) {
-      const currentCount = await findUserAccount.blockedAccount.wrongPwCounter;
+      const currentCount = findUserAccount.blockedAccount.wrongPwCounter;
       const changeBlockStatus = currentCount >= 3 && true;
       await User.findOneAndUpdate(
         { email },

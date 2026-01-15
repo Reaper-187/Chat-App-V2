@@ -7,6 +7,7 @@ const {
   loginUser,
   registUser,
   logOutUser,
+  emailVerify,
 } = require("./user.controller");
 
 const router = Router();
@@ -14,6 +15,8 @@ const router = Router();
 router.get("/userInfo", checkUserAuth, checkGuestExpiry, userInfo);
 
 router.post("/login", loginUser);
+
+router.get("/verifyUser", emailVerify);
 
 router.post("/regist", registUser);
 

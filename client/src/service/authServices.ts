@@ -8,7 +8,7 @@ const LOGIN_API = import.meta.env.VITE_API_LOGIN;
 const REGISTER_API = import.meta.env.VITE_API_REGISTER;
 const LOGOUT_API = import.meta.env.VITE_API_LOGOUT;
 const GUEST_ACCESS_API = import.meta.env.VITE_API_GUEST_ACCESS;
-// const FORGOTPW_API = import.meta.env.VITE_API_FORGOTPW;
+const FORGOTPW_API = import.meta.env.VITE_API_FORGOTPW;
 // const VERIFYOTP_API = import.meta.env.VITE_API_VERIFYOTP;
 // const RESET_USER_PW_API = import.meta.env.VITE_API_RESETUPW;
 // const CHANGE_PW_API = import.meta.env.VITE_API_CHANGEPW;
@@ -70,5 +70,20 @@ export const guestAccess = async () => {
       withCredentials: true,
     }
   );
+  return response.data;
+};
+
+export type RequestTokenResponse = {
+  email: string;
+  token?: number;
+};
+
+export const forgotPw = async (
+  data: RequestTokenResponse
+): Promise<RequestTokenResponse> => {
+  const response = await axios.post<RequestTokenResponse>(FORGOTPW_API, data, {
+    withCredentials: true,
+  });
+
   return response.data;
 };

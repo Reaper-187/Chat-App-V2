@@ -172,7 +172,7 @@ exports.loginUser = async (req: Request, res: Response) => {
             wrongPwCounter: currentCount + 1,
             blocked: changeBlockStatus,
           },
-        }
+        },
       );
       const failMessage =
         currentCount >= 3
@@ -187,7 +187,7 @@ exports.loginUser = async (req: Request, res: Response) => {
             wrongPwCounter: 0,
             blocked: false,
           },
-        }
+        },
       );
     }
     // bei Anfragen wird so indentifiziert ob der user auth ist
@@ -204,7 +204,7 @@ exports.loginUser = async (req: Request, res: Response) => {
 exports.logOutUser = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { userId } = req.session;
@@ -230,5 +230,79 @@ exports.logOutUser = async (
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.forgotPw = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    if (!email)
+      return res.status(400).json({ message: "Please enter your Email" });
+
+    const findUserAccount = await User.findOne({ email });
+
+    if (!findUserAccount)
+      return res.status(400).json({ message: "Email not found" });
+
+    const token = Math.floor(100000 + Math.random() * 900000);
+
+    const otpNum = Math.floor(100000 + Math.random() * 900000); //10K+ damit kein 0er Code Gen wird
+
+    await User.findOneAndUpdate(
+      { email },
+      {
+        otp: {
+          otpNum,
+          otpExp: Date.now() + 10 * 60 * 1000,
+        },
+        resetToken: {
+          token,
+          tokenExp: Date.now() + 10 * 60 * 1000, // 10 min
+        },
+      },
+    );
+
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: EMAIL_USER,
+        pass: EMAIL_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: EMAIL_USER,
+      to: email,
+      subject: "Password-Reset-OTP",
+      text: `Your OTP is: ${otpNum}`, // Fallback für reine Text-Clients
+      html: `
+        <p>Your 6-digit password reset code is:</p>
+        <div style="
+          font-size: 2em; 
+          font-weight: bold; 
+          border: 2px solid #000; 
+          padding: 10px; 
+          display: inline-block;
+          margin-top: 10px;
+          text-align: center;
+          border-radius: 5px;
+          color: #333;
+          background-color: #f0f0f0;
+        ">
+          ${otpNum}
+        </div>
+        <p>This code is valid for 10 minutes.</p>
+      `,
+    });
+
+    res.status(200).json({
+      message: "Reset successfully",
+      token,
+    });
+  } catch (err) {
+    res.status(500).json("Server Error");
   }
 };

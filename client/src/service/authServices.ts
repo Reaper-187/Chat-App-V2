@@ -9,7 +9,7 @@ const REGISTER_API = import.meta.env.VITE_API_REGISTER;
 const LOGOUT_API = import.meta.env.VITE_API_LOGOUT;
 const GUEST_ACCESS_API = import.meta.env.VITE_API_GUEST_ACCESS;
 const FORGOTPW_API = import.meta.env.VITE_API_FORGOTPW;
-// const VERIFYOTP_API = import.meta.env.VITE_API_VERIFYOTP;
+const VERIFYOTP_API = import.meta.env.VITE_API_VERIFYOTP;
 // const RESET_USER_PW_API = import.meta.env.VITE_API_RESETUPW;
 // const CHANGE_PW_API = import.meta.env.VITE_API_CHANGEPW;
 
@@ -42,7 +42,7 @@ export type UserRegisterProps = {
 };
 
 export const fetchRegister = async (
-  data: UserRegisterProps
+  data: UserRegisterProps,
 ): Promise<ApiMessage> => {
   const response = await axios.post<ApiMessage>(REGISTER_API, data, {
     withCredentials: true,
@@ -56,7 +56,7 @@ export const fetchLogout = async () => {
     {},
     {
       withCredentials: true,
-    }
+    },
   );
 
   return response.data;
@@ -68,7 +68,7 @@ export const guestAccess = async () => {
     {},
     {
       withCredentials: true,
-    }
+    },
   );
   return response.data;
 };
@@ -79,9 +79,22 @@ export type RequestTokenResponse = {
 };
 
 export const forgotPw = async (
-  data: RequestTokenResponse
+  data: RequestTokenResponse,
 ): Promise<RequestTokenResponse> => {
   const response = await axios.post<RequestTokenResponse>(FORGOTPW_API, data, {
+    withCredentials: true,
+  });
+
+  return response.data;
+};
+
+export type RequestOtp = {
+  otpNum: string;
+  token: number;
+};
+
+export const verifyUserOtp = async (data: RequestOtp): Promise<RequestOtp> => {
+  const response = await axios.post<RequestOtp>(VERIFYOTP_API, data, {
     withCredentials: true,
   });
 

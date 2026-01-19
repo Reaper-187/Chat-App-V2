@@ -306,3 +306,51 @@ exports.forgotPw = async (req: Request, res: Response) => {
     res.status(500).json("Server Error");
   }
 };
+
+exports.verifyOtp = async (req: Request, res: Response) => {
+  try {
+    const { otpNum, token: otpToken } = req.body;
+
+    const resetCodeInt = Number(otpNum);
+
+    if (!resetCodeInt)
+      return res.status(400).json({ message: "OTP verification failed" });
+
+    const user = await User.findOne({ "resetToken.token": otpToken });
+
+    if (!user) return res.status(400).json({ message: "Invalid request" });
+
+    const tokenExpTime = user.resetToken.tokenExp;
+
+    if (tokenExpTime < new Date())
+      return res.status(400).json({ message: "Invalid request" });
+
+    const resetCodeIntDB = user.otp.otpNum;
+
+    const otpExpTime = user.otp.otpExp;
+
+    if (otpExpTime < new Date())
+      return res.status(400).json({ message: "OTP verification failed" });
+
+    if (resetCodeInt != resetCodeIntDB)
+      return res.status(400).json({ message: "OTP verification failed" });
+
+    const token = Math.floor(100000 + Math.random() * 900000);
+
+    await User.findOneAndUpdate(
+      { _id: user._id },
+      {
+        otp: { otpNum: null, otpExp: null },
+        resetToken: {
+          token: token,
+          tokenExp: Date.now() + 10 * 60 * 1000,
+        },
+      },
+    );
+
+    res.status(200).json({ message: "Enter the new Password", token });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};

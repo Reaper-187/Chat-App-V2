@@ -354,3 +354,47 @@ exports.verifyOtp = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.resetUserPw = async (req: Request, res: Response) => {
+  try {
+    const { newUserPw, token: resetPwToken } = req.body;
+
+    if (!newUserPw)
+      return res.status(400).json({ message: "password verification failed" });
+
+    if (newUserPw.length < 12)
+      return res.status(400).json({ message: "password is to short" });
+
+    const user = await User.findOne({
+      "resetToken.token": resetPwToken,
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "invalid or expired reset token" });
+    }
+
+    const samePwCheck = await bcrypt.compare(newUserPw, user.password);
+    if (samePwCheck)
+      return res
+        .status(400)
+        .json({ message: "You cant use the same password as the last one" });
+
+    const hashedNewPw = await bcrypt.hash(newUserPw, 10);
+
+    await User.findOneAndUpdate(
+      { _id: user._id },
+      {
+        password: hashedNewPw,
+        resetToken: {
+          token: null,
+          tokenExp: null,
+        },
+      },
+    );
+    res.status(200).json({ message: "password is changed successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Server Error" });
+  }
+};

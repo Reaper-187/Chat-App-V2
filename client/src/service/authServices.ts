@@ -11,7 +11,7 @@ const GUEST_ACCESS_API = import.meta.env.VITE_API_GUEST_ACCESS;
 const FORGOTPW_API = import.meta.env.VITE_API_FORGOTPW;
 const VERIFYOTP_API = import.meta.env.VITE_API_VERIFYOTP;
 // const RESET_USER_PW_API = import.meta.env.VITE_API_RESETUPW;
-// const CHANGE_PW_API = import.meta.env.VITE_API_CHANGEPW;
+const CHANGE_PW_API = import.meta.env.VITE_API_CHANGEPW;
 
 export const getUserInfo = async (): Promise<UserInfoResponse> => {
   const response = await axios.get<UserInfoResponse>(USER_INFO_API, {
@@ -98,5 +98,19 @@ export const verifyUserOtp = async (data: RequestOtp): Promise<RequestOtp> => {
     withCredentials: true,
   });
 
+  return response.data;
+};
+
+export type UserChangePwProps = {
+  currentPw: string;
+  newPw: string;
+};
+
+export const userChangePw = async (
+  data: UserChangePwProps,
+): Promise<ApiMessage> => {
+  const response = await axios.post<ApiMessage>(CHANGE_PW_API, data, {
+    withCredentials: true,
+  });
   return response.data;
 };
